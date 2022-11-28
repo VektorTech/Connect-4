@@ -16,6 +16,13 @@ export default class Grid {
     return x + y * this.width;
   }
 
+  _getPositionAtIndex(n: number) {
+    const y = ~~(n / this.width);
+    const x = -(y * this.width) + n;
+
+    return [x, y];
+  }
+
   _getFillCount() {
     return this.state.reduce((total, current) => total + Number(!!current), 0);
   }
@@ -34,6 +41,29 @@ export default class Grid {
 
   setIndexXY(positionX: number, positionY: number, player: string) {
     this.state[this._getIndexAtPosition(positionX, positionY)] = player;
+  }
+
+  returnPlayerNinRowIndices(player: string, n = 4) {
+    if (n > this.width) {
+      return [];
+    }
+
+    for (let r = this.height; r > -1; r--) {
+      let indices = [];
+      for (let c = 0; c < this.width; c++) {
+        const index = this._getIndexAtPosition(c, r);
+        if (this.state[index] == player) {
+          indices.push(index);
+        } else if (indices.length) {
+          indices = [];
+        }
+
+        if (indices.length == n) {
+          return indices;
+        }
+      }
+    }
+    return [];
   }
 
   verifyPlayerNinRow(player: string, n = 4) {
