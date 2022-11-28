@@ -86,8 +86,8 @@ describe(".verifyPlayerNinRow()", () => {
 });
 
 describe(".verifyPlayerNinCol()", () => {
-  it("checks whether player occupies n consecutive cells in column on a 5x5 grid", () => {
-    const grid = new Grid(5, 5);
+  it("checks whether player occupies n consecutive cells in column on a 7x5 grid", () => {
+    const grid = new Grid(7, 5);
 
     const testCases = 4;
     const indices = [
@@ -137,5 +137,31 @@ describe(".verifyPlayerNinCol()", () => {
 
       grid.reset();
     }
+  });
+});
+
+describe(".verifyPlayerNinRightDiags()", () => {
+  it("checks whether player occupies n consecutive cells in right diagonal on a 7x5 grid", () => {
+    const grid = new Grid(7, 5);
+
+    grid.setIndexXY(0, 4, "X");
+    grid.setIndexXY(1, 3, "X");
+    grid.setIndexXY(2, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinRightDiags("X", 4)).toBe(true);
+    grid.reset();
+
+    grid.setIndexXY(0, 4, "X");
+    grid.setIndexXY(1, 2, "X");
+    grid.setIndexXY(2, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinRightDiags("X", 4)).toBe(false);
+    grid.reset();
+
+    grid.setIndexXY(0, 4, "X");
+    grid.setIndexXY(2, 3, "X");
+    grid.setIndexXY(2, 3, "X");
+    grid.setIndexXY(3, 0, "X");
+    expect(grid.verifyPlayerNinRightDiags("X", 4)).toBe(false);
   });
 });

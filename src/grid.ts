@@ -1,9 +1,9 @@
 export default class Grid {
-  lastPlayer = "";
-  width: number;
-  height: number;
-  cellCount: number;
-  state: string[];
+  private lastPlayer = "";
+  private width: number;
+  private height: number;
+  private cellCount: number;
+  private state: string[];
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -12,23 +12,27 @@ export default class Grid {
     this.reset();
   }
 
-  _getIndexAtPosition(x: number, y: number) {
+  private getIndexAtPosition(x: number, y: number) {
     return x + y * this.width;
   }
 
-  _getPositionAtIndex(n: number) {
+  private getPositionAtIndex(n: number) {
     const y = ~~(n / this.width);
     const x = -(y * this.width) + n;
 
-    return [x, y];
+    return { x, y };
   }
 
-  _getFillCount() {
+  private getFillCount() {
     return this.state.reduce((total, current) => total + Number(!!current), 0);
   }
 
-  _isGridFilled() {
-    return this._getFillCount() == this.cellCount;
+  private isGridFilled() {
+    return this.getFillCount() == this.cellCount;
+  }
+
+  private shouldStopCheckNinLine(n: number) {
+    return this.getFillCount() < n;
   }
 
   reset() {
@@ -36,22 +40,24 @@ export default class Grid {
   }
 
   setIndex(position: number, player: string) {
+    this.lastPlayer = player;
     this.state[position] = player;
   }
 
   setIndexXY(positionX: number, positionY: number, player: string) {
-    this.state[this._getIndexAtPosition(positionX, positionY)] = player;
+    this.lastPlayer = player;
+    this.state[this.getIndexAtPosition(positionX, positionY)] = player;
   }
 
   returnPlayerNinRowIndices(player: string, n = 4) {
-    if (n > this.width) {
+    if (n > this.width || this.shouldStopCheckNinLine(n)) {
       return [];
     }
 
-    for (let r = this.height; r > -1; r--) {
+    for (let r = this.height - 1; r > -1; r--) {
       let indices = [];
       for (let c = 0; c < this.width; c++) {
-        const index = this._getIndexAtPosition(c, r);
+        const index = this.getIndexAtPosition(c, r);
         if (this.state[index] == player) {
           indices.push(index);
         } else if (indices.length) {
@@ -67,16 +73,15 @@ export default class Grid {
   }
 
   verifyPlayerNinRow(player: string, n = 4) {
-    if (n > this.width) {
+    if (n > this.width || this.shouldStopCheckNinLine(n)) {
       return false;
     }
 
-    for (let r = this.height; r > -1; r--) {
+    for (let r = this.height - 1; r > -1; r--) {
       let count = 0;
       for (let c = 0; c < this.width; c++) {
         count +=
-          Number(this.state[this._getIndexAtPosition(c, r)] == player) ||
-          -count;
+          Number(this.state[this.getIndexAtPosition(c, r)] == player) || -count;
 
         if (count == n) {
           return true;
@@ -87,14 +92,14 @@ export default class Grid {
   }
 
   returnPlayerNinColIndices(player: string, n = 4) {
-    if (n > this.height) {
+    if (n > this.height || this.shouldStopCheckNinLine(n)) {
       return [];
     }
 
-    for (let c = 0; c < this.height; c++) {
+    for (let c = 0; c < this.width; c++) {
       let indices = [];
-      for (let r = this.height; r > -1; r--) {
-        const index = this._getIndexAtPosition(c, r);
+      for (let r = this.height - 1; r > -1; r--) {
+        const index = this.getIndexAtPosition(c, r);
         if (this.state[index] == player) {
           indices.push(index);
         } else if (indices.length) {
@@ -110,16 +115,15 @@ export default class Grid {
   }
 
   verifyPlayerNinCol(player: string, n = 4) {
-    if (n > this.height) {
+    if (n > this.height || this.shouldStopCheckNinLine(n)) {
       return false;
     }
 
-    for (let c = 0; c < this.height; c++) {
+    for (let c = 0; c < this.width; c++) {
       let count = 0;
-      for (let r = this.height; r > -1; r--) {
+      for (let r = this.height - 1; r > -1; r--) {
         count +=
-          Number(this.state[this._getIndexAtPosition(c, r)] == player) ||
-          -count;
+          Number(this.state[this.getIndexAtPosition(c, r)] == player) || -count;
 
         if (count == n) {
           return true;
@@ -129,7 +133,37 @@ export default class Grid {
     return false;
   }
 
-  verifyPlayerNinDiag(player: number, n = 4) {}
+  verifyPlayerNinRightDiags(player: string, n = 4) {
+    if (n > this.width || n > this.height || this.shouldStopCheckNinLine(n)) {
+      return false;
+    }
+
+    const jump = this.width - 1;
+
+    let i = this.cellCount - n + 1;
+    while (i > this.width * (n - 1)) {
+      if (this.state[i] == player) {
+        let _count = 1;
+        checkDiag: for (let d = i - jump; d > n - 1; d - jump) {
+          if (this.state[d] == player) {
+            _count++;
+          } else break checkDiag;
+
+          if (_count == n) {
+            return true;
+          }
+        }
+      }
+
+      if ((i + 1) % this.width == 0) {
+        i -= n + 1;
+      } else {
+        i--;
+      }
+    }
+
+    return false;
+  }
 
   getLayout() {
     return this.state.reduce<string[][]>((grid, cell, index) => {
