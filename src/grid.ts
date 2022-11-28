@@ -9,11 +9,11 @@ export default class Grid {
     this.width = width;
     this.height = height;
     this.cellCount = this.width * this.height;
-    this.state = new Array(this.cellCount).fill("");
+    this.reset();
   }
 
   _getIndexAtPosition(x: number, y: number) {
-    return x + (y - 1) * this.width;
+    return x + y * this.width;
   }
 
   _getFillCount() {
@@ -22,6 +22,10 @@ export default class Grid {
 
   _isGridFilled() {
     return this._getFillCount() == this.cellCount;
+  }
+
+  reset() {
+    this.state = this.state = new Array(this.cellCount).fill("");
   }
 
   setIndex(position: number, player: string) {
