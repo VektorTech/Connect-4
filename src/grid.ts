@@ -37,7 +37,7 @@ export default class Grid {
   }
 
   verifyPlayerNinRow(player: string, n = 4) {
-    for (let r = 0; r < this.height; r++) {
+    for (let r = this.height; r > -1; r--) {
       let count = 0;
       for (let c = 0; c < this.width; c++) {
         count +=
