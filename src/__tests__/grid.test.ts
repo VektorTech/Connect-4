@@ -32,7 +32,7 @@ describe(".getLayout()", () => {
 });
 
 describe(".verifyPlayerNinRow()", () => {
-  it("checks whether player occupies n consecutive cells in 3x3 grid", () => {
+  it("checks whether player occupies n consecutive cells in row on a 3x3 grid", () => {
     const grid = new Grid(3, 3);
 
     const testCases = 4;
@@ -76,6 +76,61 @@ describe(".verifyPlayerNinRow()", () => {
       const currentExpected = expectedResults[i];
       for (let j = 0; j < currentExpected.length; j++) {
         expect(grid.verifyPlayerNinRow("X", inLine[j])).toBe(
+          currentExpected[j]
+        );
+      }
+
+      grid.reset();
+    }
+  });
+});
+
+describe(".verifyPlayerNinCol()", () => {
+  it("checks whether player occupies n consecutive cells in column on a 5x5 grid", () => {
+    const grid = new Grid(5, 5);
+
+    const testCases = 4;
+    const indices = [
+      [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+      ],
+      [
+        [3, 3],
+        [3, 2],
+        [3, 1],
+      ],
+      [
+        [1, 0],
+        [1, 1],
+        [2, 1],
+        [2, 0],
+      ],
+      [
+        [2, 4],
+        [2, 3],
+        [3, 4],
+        [3, 3],
+      ],
+    ];
+    const expectedResults = [
+      [true, false, true],
+      [true, false, true],
+      [false, false, true],
+      [false, false, true],
+    ];
+    const inLine = [3, 4, 2];
+
+    for (let i = 0; i < testCases; i++) {
+      const currentIndex = indices[i];
+      for (let index of currentIndex) {
+        grid.setIndexXY(index[0], index[1], "X");
+      }
+
+      const currentExpected = expectedResults[i];
+      for (let j = 0; j < currentExpected.length; j++) {
+        expect(grid.verifyPlayerNinCol("X", inLine[j])).toBe(
           currentExpected[j]
         );
       }

@@ -67,9 +67,56 @@ export default class Grid {
   }
 
   verifyPlayerNinRow(player: string, n = 4) {
+    if (n > this.width) {
+      return false;
+    }
+
     for (let r = this.height; r > -1; r--) {
       let count = 0;
       for (let c = 0; c < this.width; c++) {
+        count +=
+          Number(this.state[this._getIndexAtPosition(c, r)] == player) ||
+          -count;
+
+        if (count == n) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  returnPlayerNinColIndices(player: string, n = 4) {
+    if (n > this.height) {
+      return [];
+    }
+
+    for (let c = 0; c < this.height; c++) {
+      let indices = [];
+      for (let r = this.height; r > -1; r--) {
+        const index = this._getIndexAtPosition(c, r);
+        if (this.state[index] == player) {
+          indices.push(index);
+        } else if (indices.length) {
+          indices = [];
+        }
+
+        if (indices.length == n) {
+          return indices;
+        }
+      }
+    }
+    return [];
+  }
+
+  verifyPlayerNinCol(player: string, n = 4) {
+    if (n > this.height) {
+      return false;
+    }
+
+    for (let c = 0; c < this.height; c++) {
+      let count = 0;
+      for (let r = this.height; r > -1; r--) {
         count +=
           Number(this.state[this._getIndexAtPosition(c, r)] == player) ||
           -count;
