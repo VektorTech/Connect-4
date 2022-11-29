@@ -165,3 +165,53 @@ describe(".verifyPlayerNinRightDiags()", () => {
     expect(grid.verifyPlayerNinRightDiags("X", 4)).toBe(false);
   });
 });
+
+describe(".verifyPlayerNinLeftDiags()", () => {
+  it("checks whether player occupies n consecutive cells in left diagonal on a 7x5 grid", () => {
+    const grid = new Grid(7, 5);
+
+    grid.setIndexXY(0, 4, "X");
+    grid.setIndexXY(1, 3, "X");
+    grid.setIndexXY(2, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 4)).toBe(false);
+    grid.reset();
+
+    grid.setIndexXY(0, 4, "X");
+    grid.setIndexXY(1, 2, "X");
+    grid.setIndexXY(2, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 4)).toBe(false);
+    grid.reset();
+
+    grid.setIndexXY(0, 4, "X");
+    grid.setIndexXY(2, 3, "X");
+    grid.setIndexXY(2, 3, "X");
+    grid.setIndexXY(3, 0, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 4)).toBe(false);
+    grid.reset();
+
+    grid.setIndexXY(6, 4, "X");
+    grid.setIndexXY(5, 3, "X");
+    grid.setIndexXY(4, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 4)).toBe(true);
+
+    grid.setIndexXY(6, 4, "X");
+    grid.setIndexXY(5, 3, "X");
+    grid.setIndexXY(4, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 3)).toBe(true);
+
+    grid.setIndexXY(6, 4, "X");
+    grid.setIndexXY(5, 3, "X");
+    grid.setIndexXY(4, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 5)).toBe(false);
+
+    grid.setIndexXY(4, 2, "X");
+    grid.setIndexXY(3, 1, "X");
+    grid.setIndexXY(2, 0, "X");
+    expect(grid.verifyPlayerNinLeftDiags("X", 3)).toBe(true);
+  });
+});
