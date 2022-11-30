@@ -4,6 +4,8 @@ export default class Grid {
   private rowCount: number;
   private cellCount: number;
   private state: string[];
+  private racks: number[];
+  private winnerCells: number[] = [];
 
   constructor(width: number, height: number) {
     this.columnCount = width;
@@ -18,7 +20,7 @@ export default class Grid {
 
   private getPositionAtIndex(n: number) {
     const y = ~~(n / this.columnCount);
-    const x = -(y * this.columnCount) + n;
+    const x = n - y * this.columnCount;
 
     return { x, y };
   }
@@ -27,16 +29,17 @@ export default class Grid {
     return this.state.reduce((total, current) => total + Number(!!current), 0);
   }
 
-  private isGridFilled() {
-    return this.getFillCount() == this.cellCount;
-  }
-
-  private shouldStopCheckNinLine(n: number) {
+  private isBelowFillCount(n: number) {
     return this.getFillCount() < n;
   }
 
   reset() {
-    this.state = this.state = new Array(this.cellCount).fill("");
+    this.state = new Array(this.cellCount).fill("");
+    this.racks = new Array(this.columnCount).fill(this.rowCount);
+  }
+
+  isGridFilled() {
+    return this.getFillCount() == this.cellCount;
   }
 
   setIndex(position: number, player: string) {
@@ -49,22 +52,32 @@ export default class Grid {
     this.state[this.getIndexAtPosition(positionX, positionY)] = player;
   }
 
-  returnPlayerNinRowIndices(player: string, n = 4) {
-    if (n > this.columnCount || this.shouldStopCheckNinLine(n)) {
+  dropDisc(colIndex: number, player: string) {
+    const rowIndex = --this.racks[colIndex];
+    this.setIndexXY(colIndex, rowIndex, player);
+    return rowIndex;
+  }
+
+  get winningCells() {
+    return this.winnerCells;
+  }
+
+  getWinningIndicesHorizontal(player: string, inLine = 4) {
+    if (inLine > this.columnCount || this.isBelowFillCount(inLine)) {
       return [];
     }
 
-    for (let r = this.rowCount - 1; r > -1; r--) {
+    for (let row = this.rowCount - 1; row > -1; row--) {
       let indices = [];
-      for (let c = 0; c < this.columnCount; c++) {
-        const index = this.getIndexAtPosition(c, r);
+      for (let col = 0; col < this.columnCount; col++) {
+        const index = this.getIndexAtPosition(col, row);
         if (this.state[index] == player) {
           indices.push(index);
         } else if (indices.length) {
           indices = [];
         }
 
-        if (indices.length == n) {
+        if (indices.length == inLine) {
           return indices;
         }
       }
@@ -72,41 +85,33 @@ export default class Grid {
     return [];
   }
 
-  verifyPlayerNinRow(player: string, n = 4) {
-    if (n > this.columnCount || this.shouldStopCheckNinLine(n)) {
-      return false;
+  checkPlayerWinHorizontal(player: string, inLine = 4) {
+    const results = this.getWinningIndicesHorizontal(player, inLine);
+    const passed = !!results.length;
+
+    if (passed) {
+      this.winnerCells = results;
     }
 
-    for (let r = this.rowCount - 1; r > -1; r--) {
-      let count = 0;
-      for (let c = 0; c < this.columnCount; c++) {
-        count +=
-          Number(this.state[this.getIndexAtPosition(c, r)] == player) || -count;
-
-        if (count == n) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return passed;
   }
 
-  returnPlayerNinColIndices(player: string, n = 4) {
-    if (n > this.rowCount || this.shouldStopCheckNinLine(n)) {
+  getWinningIndicesVertical(player: string, inLine = 4) {
+    if (inLine > this.rowCount || this.isBelowFillCount(inLine)) {
       return [];
     }
 
-    for (let c = 0; c < this.columnCount; c++) {
+    for (let col = 0; col < this.columnCount; col++) {
       let indices = [];
-      for (let r = this.rowCount - 1; r > -1; r--) {
-        const index = this.getIndexAtPosition(c, r);
+      for (let row = this.rowCount - 1; row > -1; row--) {
+        const index = this.getIndexAtPosition(col, row);
         if (this.state[index] == player) {
           indices.push(index);
         } else if (indices.length) {
           indices = [];
         }
 
-        if (indices.length == n) {
+        if (indices.length == inLine) {
           return indices;
         }
       }
@@ -114,95 +119,117 @@ export default class Grid {
     return [];
   }
 
-  verifyPlayerNinCol(player: string, n = 4) {
-    if (n > this.rowCount || this.shouldStopCheckNinLine(n)) {
-      return false;
+  checkPlayerWinVertical(player: string, inLine = 4) {
+    const results = this.getWinningIndicesVertical(player, inLine);
+    const passed = !!results.length;
+
+    if (passed) {
+      this.winnerCells = results;
     }
 
-    for (let c = 0; c < this.columnCount; c++) {
-      let count = 0;
-      for (let r = this.rowCount - 1; r > -1; r--) {
-        count +=
-          Number(this.state[this.getIndexAtPosition(c, r)] == player) || -count;
-
-        if (count == n) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return passed;
   }
 
-  verifyPlayerNinRightDiags(player: string, n = 4) {
+  getWinningIndicesRightDiag(player: string, inLine = 4) {
     if (
-      n > this.columnCount ||
-      n > this.rowCount ||
-      this.shouldStopCheckNinLine(n)
+      inLine > this.columnCount ||
+      inLine > this.rowCount ||
+      this.isBelowFillCount(inLine)
     ) {
-      return false;
+      return [];
     }
 
-    const jump = this.columnCount - 1;
+    const skip = this.columnCount - 1;
 
-    let i = this.cellCount - n + 1;
-    while (i > this.columnCount * (n - 1)) {
-      if (this.state[i] == player) {
-        let _count = 1;
-        checkDiag: for (let d = i - jump; d > n - 1; d - jump) {
-          if (this.state[d] == player) {
-            _count++;
-          } else break checkDiag;
+    let index = this.cellCount - inLine;
+    while (index > this.columnCount * (inLine - 1)) {
+      if (this.state[index] == player) {
+        let indices = [index];
+        step: for (
+          let diagIndex = index - skip;
+          diagIndex > inLine - 1;
+          diagIndex -= skip
+        ) {
+          if (this.state[diagIndex] == player) {
+            indices.push(diagIndex);
+          } else break step;
 
-          if (_count == n) {
-            return true;
+          if (indices.length == inLine) {
+            return indices;
           }
         }
       }
 
-      if ((i + 1) % this.columnCount == 0) {
-        i -= n + 1;
+      if ((index + 1) % this.columnCount == 0) {
+        index -= inLine + 1;
       } else {
-        i--;
+        index--;
       }
     }
 
-    return false;
+    return [];
   }
 
-  verifyPlayerNinLeftDiags(player: string, n = 4) {
-    if (
-      n > this.columnCount ||
-      n > this.rowCount ||
-      this.shouldStopCheckNinLine(n)
-    ) {
-      return false;
+  checkPlayerWinRightDiag(player: string, inLine = 4) {
+    const results = this.getWinningIndicesRightDiag(player, inLine);
+    const passed = !!results.length;
+
+    if (passed) {
+      this.winnerCells = results;
     }
 
-    const jump = this.columnCount + 1;
+    return passed;
+  }
 
-    let i = this.cellCount - 1;
-    while (i > this.columnCount * (n - 1) + (n - 1)) {
-      if (this.state[i] == player) {
-        let _count = 1;
-        checkDiag: for (let d = i - jump; d > -1; d - jump) {
-          if (this.state[d] == player) {
-            _count++;
-          } else break checkDiag;
+  getWinningIndicesLeftDiag(player: string, inLine = 4) {
+    if (
+      inLine > this.columnCount ||
+      inLine > this.rowCount ||
+      this.isBelowFillCount(inLine)
+    ) {
+      return [];
+    }
 
-          if (_count == n) {
-            return true;
+    const skip = this.columnCount + 1;
+
+    let index = this.cellCount - 1;
+    while (index > this.columnCount * (inLine - 1) + (inLine - 1)) {
+      if (this.state[index] == player) {
+        let indices = [index];
+        step: for (
+          let diagIndex = index - skip;
+          diagIndex > -1;
+          diagIndex -= skip
+        ) {
+          if (this.state[diagIndex] == player) {
+            indices.push(diagIndex);
+          } else break step;
+
+          if (indices.length == inLine) {
+            return indices;
           }
         }
       }
 
-      if ((i - (n - 1)) % this.columnCount == 0) {
-        i -= n;
+      if ((index - (inLine - 1)) % this.columnCount == 0) {
+        index -= inLine;
       } else {
-        i--;
+        index--;
       }
     }
 
-    return false;
+    return [];
+  }
+
+  checkPlayerWinLeftDiag(player: string, inLine = 4) {
+    const results = this.getWinningIndicesLeftDiag(player, inLine);
+    const passed = !!results.length;
+
+    if (passed) {
+      this.winnerCells = results;
+    }
+
+    return passed;
   }
 
   getLayout() {
