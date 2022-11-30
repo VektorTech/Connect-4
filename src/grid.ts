@@ -36,6 +36,7 @@ export default class Grid {
   reset() {
     this.state = new Array(this.cellCount).fill("");
     this.racks = new Array(this.columnCount).fill(this.rowCount);
+    this.winnerCells = [];
   }
 
   isGridFilled() {
@@ -244,5 +245,35 @@ export default class Grid {
 
       return grid;
     }, []);
+  }
+
+  scorePosition() {
+    const around = [
+      [0, 0],
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [1, 1],
+      [1, -1],
+      [-1, 0],
+      [-1, 1],
+      [-1, -1],
+    ];
+    const score: Record<string, number> = {};
+    for (let row = 0; row < this.rowCount; row++) {
+      for (let col = 0; col < this.columnCount; col++) {
+        const index = this.getIndexAtPosition(col, row);
+        const player = this.state[index];
+
+        if (player) {
+          const evaluation = around.reduce((acc, [c, r]) => {
+            const _i = this.getIndexAtPosition(col + c, row + r);
+            return acc + Number(this.state[_i] == player);
+          }, 0);
+          score[player] = evaluation + (score[player] ?? 0);
+        }
+      }
+    }
+    return score;
   }
 }
