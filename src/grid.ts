@@ -16,8 +16,12 @@ export default class Grid {
     this.reset();
   }
 
+  static getIndexAtPosition(x: number, y: number, col: number) {
+    return x + y * col;
+  }
+
   private getIndexAtPosition(x: number, y: number) {
-    return x + y * this.columnCount;
+    return Grid.getIndexAtPosition(x, y, this.columnCount);
   }
 
   private getPositionAtIndex(index: number) {
@@ -42,16 +46,25 @@ export default class Grid {
   }
 
   setIndex(position: number, player: number) {
+    if (this.isGridFilled()) {
+      throw new Error("No more slots available in grid");
+    }
     this.lastPlayer = player;
     this.state[position] = player;
   }
 
   setIndexXY(positionX: number, positionY: number, player: number) {
+    if (this.isGridFilled()) {
+      throw new Error("No more slots available in grid");
+    }
     this.lastPlayer = player;
     this.state[this.getIndexAtPosition(positionX, positionY)] = player;
   }
 
   dropDisc(colIndex: number, player: number) {
+    if (this.isGridFilled()) {
+      throw new Error("No more slots available in grid");
+    }
     const rowIndex = --this.racks[colIndex];
     this.setIndexXY(colIndex, rowIndex, player);
     return rowIndex;
@@ -171,7 +184,7 @@ export default class Grid {
 
       index--;
       if ((index + 1) % this.columnCount == 0) {
-        index -= this.NConsecutive + 1;
+        index -= this.NConsecutive - 1;
       }
     }
 
@@ -243,6 +256,15 @@ export default class Grid {
     return passed;
   }
 
+  checkWinner(player: number) {
+    return (
+      this.checkPlayerWinHorizontal(player) ||
+      this.checkPlayerWinVertical(player) ||
+      this.checkPlayerWinLeftDiag(player) ||
+      this.checkPlayerWinRightDiag(player)
+    );
+  }
+
   getLayout() {
     return this.state.reduce<number[][]>((grid, cell, index) => {
       const rowIndex = ~~(index / this.columnCount);
@@ -300,20 +322,21 @@ export default class Grid {
             score[player] = (score[player] ?? 0) + i;
             i++;
           }
-          const evaluation = around.reduce((acc, [c, r]) => {
-            const _col = col + c;
-            const _row = row + r;
-            if (
-              _col < 0 ||
-              _col > this.columnCount - 1 ||
-              _row < 0 ||
-              _row > this.rowCount - 1
-            ) {
-              return acc;
-            }
-            const _i = this.getIndexAtPosition(_col, _row);
-            return acc + Number(this.state[_i] == player);
-          }, 1) * 0.5;
+          const evaluation =
+            around.reduce((acc, [c, r]) => {
+              const _col = col + c;
+              const _row = row + r;
+              if (
+                _col < 0 ||
+                _col > this.columnCount - 1 ||
+                _row < 0 ||
+                _row > this.rowCount - 1
+              ) {
+                return acc;
+              }
+              const _i = this.getIndexAtPosition(_col, _row);
+              return acc + Number(this.state[_i] == player);
+            }, 1) * 0.5;
           const middleColumnsBias = midCol - Math.abs(midCol - col);
           score[player] = (score[player] ?? 0) + evaluation + middleColumnsBias;
         }
@@ -345,6 +368,7 @@ export default class Grid {
 }
 
 export type GridType = typeof Grid;
+
 declare global {
   var Grid: GridType;
 }
