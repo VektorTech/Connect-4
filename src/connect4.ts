@@ -7,7 +7,7 @@ export default class Connect4 extends Game {
 
   constructor() {
     super(Connect4.COLUMN_COUNT, Connect4.ROW_COUNT, Connect4.CONNECT);
-    this.addPlayer("John");
-    this.addPlayer("Fred");
+    this.addPlayer("Human");
+    this.addPlayer("MiniMax");
   }
 }
