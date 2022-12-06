@@ -14,6 +14,11 @@ export default class Game {
     window._grid = this.grid;
   }
 
+  reset() {
+    this.grid.reset();
+    this.currentPlayer = 0;
+  }
+
   addPlayer(playerID: string) {
     this.players.push(playerID);
   }

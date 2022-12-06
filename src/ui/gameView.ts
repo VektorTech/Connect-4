@@ -1,5 +1,3 @@
-import { getIndexAtPosition } from "../utils";
-
 export default class GameView {
   private root: HTMLElement;
   private grid: HTMLElement;
@@ -23,6 +21,14 @@ export default class GameView {
     } else {
       throw new TypeError("Invalid Element Type");
     }
+  }
+
+  clear() {
+    this.lock = false;
+    this.cells.forEach(cell => cell.innerHTML = "");
+    this.discAdded = 0;
+    this.num = 0;
+    this.discs = new Array(this.colCount * this.rowCount);
   }
 
   generate(col: number, row: number) {
@@ -70,7 +76,7 @@ export default class GameView {
     disc.style.setProperty("--rowOffset", row.toString());
     this.num = 1 - this.num;
     this.grid.appendChild(disc);
-    const index = getIndexAtPosition(col, row, this.colCount);
+    const index = Grid.getIndexAtPosition(col, row, this.colCount);
     this.discs[index] = disc;
     disc.addEventListener("animationend", () => {
       this.cells[index].appendChild(disc);
