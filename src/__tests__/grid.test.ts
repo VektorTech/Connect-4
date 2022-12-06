@@ -2,23 +2,23 @@ import Grid from "../grid";
 
 describe(".getLayout()", () => {
   const gridSizes = [
-    [3, 3],
-    [16, 8],
-    [10, 12],
-    [2, 2],
-    [1, 1],
-    [1, 11],
-    [100, 30],
-    [30, 100],
-    [11, 300],
-    [41, 23],
-    [31, 99],
+    [3, 3, 4],
+    [16, 8, 4],
+    [10, 12, 4],
+    [2, 2, 4],
+    [1, 1, 4],
+    [1, 11, 4],
+    [100, 30, 4],
+    [30, 100, 4],
+    [11, 300, 4],
+    [41, 23, 4],
+    [31, 99, 4],
   ];
 
   it.each(gridSizes)(
-    "returns a 2 dimensional array of strings representing a grid sized %ix%i",
-    (cols, rows) => {
-      const grid = new Grid(cols, rows);
+    "returns a 2 dimensional array of numbers representing a grid sized %ix%i",
+    (cols, rows, n) => {
+      const grid = new Grid(cols, rows, n);
       const layout = grid.getLayout();
 
       expect(layout.length).toBe(rows);
@@ -26,14 +26,13 @@ describe(".getLayout()", () => {
       for (let row of layout) {
         expect(Array.isArray(row)).toBeTruthy();
         expect(row).toHaveLength(cols);
-        expect(row.every((cell) => typeof cell == "string")).toBeTruthy();
+        expect(row.every((cell) => typeof cell == "number")).toBeTruthy();
       }
     }
   );
 });
 
 describe(".checkPlayerWinHorizontal()", () => {
-  const grid = new Grid(3, 3);
   const indices = [
     [
       [0, 0],
@@ -63,10 +62,6 @@ describe(".checkPlayerWinHorizontal()", () => {
   ];
   const inLine = [3, 4, 2];
 
-  afterEach(() => {
-    return grid.reset();
-  });
-
   it.each(indices)(
     "checks whether player occupies n consecutive cells in row on a 3x3 grid: " +
       "%j, %j, %j",
@@ -74,19 +69,19 @@ describe(".checkPlayerWinHorizontal()", () => {
       const expected = pos.pop();
       const current = pos as number[][];
 
-      for (const index of current) {
-        grid.setIndexXY(index[0], index[1], "X");
-      }
-
       for (let i = 0; i < expected.length; i++) {
-        expect(grid.checkPlayerWinHorizontal("X", inLine[i])).toBe(expected[i]);
+        const grid = new Grid(3, 3, inLine[i]);
+
+        for (const index of current) {
+          grid.setIndexXY(index[0], index[1], 1);
+        }
+        expect(grid.checkPlayerWinHorizontal(1)).toBe(expected[i]);
       }
     }
   );
 });
 
 describe(".checkPlayerWinVertical()", () => {
-  const grid = new Grid(7, 5);
   const indices = [
     [
       [0, 0],
@@ -117,10 +112,6 @@ describe(".checkPlayerWinVertical()", () => {
   ];
   const inLine = [3, 4, 2];
 
-  afterEach(() => {
-    return grid.reset();
-  });
-
   it.each(indices)(
     "checks whether player occupies n consecutive cells in column on a 7x5 grid: " +
       "%j, %j, %j",
@@ -128,19 +119,19 @@ describe(".checkPlayerWinVertical()", () => {
       const expected = pos.pop();
       const current = pos as number[][];
 
-      for (const index of current) {
-        grid.setIndexXY(index[0], index[1], "X");
-      }
-
       for (let i = 0; i < expected.length; i++) {
-        expect(grid.checkPlayerWinVertical("X", inLine[i])).toBe(expected[i]);
+        const grid = new Grid(7, 5, inLine[i]);
+
+        for (const index of current) {
+          grid.setIndexXY(index[0], index[1], 1);
+        }
+        expect(grid.checkPlayerWinVertical(1)).toBe(expected[i]);
       }
     }
   );
 });
 
 describe(".checkPlayerWinLeftDiag()", () => {
-  const grid = new Grid(7, 5);
   const indices = [
     [[0, 4], [1, 3], [2, 2], [3, 1], 4, [], false],
     [[0, 4], [1, 2], [2, 2], [3, 1], 4, [], false],
@@ -151,10 +142,6 @@ describe(".checkPlayerWinLeftDiag()", () => {
     [[4, 2], [3, 1], [2, 0], [0, 0], 3, [18, 10, 2], true],
   ];
 
-  afterEach(() => {
-    return grid.reset();
-  });
-
   it.each(indices)(
     "checks whether player occupies n consecutive cells in left diagonal on a 7x5 grid: " +
       "%j, %j, %j, %j",
@@ -163,28 +150,27 @@ describe(".checkPlayerWinLeftDiag()", () => {
       const expectedList = pos.pop() as number[];
       const inLine = pos.pop() as number;
       const current = pos as number[][];
+      const grid = new Grid(7, 5, inLine);
 
       for (const index of current) {
-        grid.setIndexXY(index[0], index[1], "X");
+        grid.setIndexXY(index[0], index[1], 1);
       }
 
-      expect(grid.checkPlayerWinLeftDiag("X", inLine)).toBe(expectedBool);
+      expect(grid.checkPlayerWinLeftDiag(1)).toBe(expectedBool);
       expect(grid.winningCells).toEqual(expectedList);
     }
   );
 });
 
 describe(".checkPlayerWinRightDiag()", () => {
-  const grid = new Grid(7, 5);
   const indices = [
     [[0, 4], [1, 3], [2, 2], [3, 1], 4, [28, 22, 16, 10], true],
     [[0, 4], [1, 2], [2, 2], [3, 1], 4, [], false],
     [[0, 4], [2, 3], [2, 3], [3, 0], 4, [], false],
+    [[0, 3], [1, 2], [2, 1], [6, 3], 4, [], false],
+    [[0, 3], [1, 2], [2, 1], [3, 0], 4, [21, 15, 9, 3], true],
+    [[0, 4], [1, 3], [2, 2], [3, 1], 4, [28, 22, 16, 10], true],
   ];
-
-  afterEach(() => {
-    return grid.reset();
-  });
 
   it.each(indices)(
     "checks whether player occupies n consecutive cells in right diagonal on a 7x5 grid: " +
@@ -194,42 +180,15 @@ describe(".checkPlayerWinRightDiag()", () => {
       const expectedList = pos.pop() as number[];
       const inLine = pos.pop() as number;
       const current = pos as number[][];
+      const grid = new Grid(7, 5, inLine);
+
 
       for (const index of current) {
-        grid.setIndexXY(index[0], index[1], "X");
+        grid.setIndexXY(index[0], index[1], 1);
       }
 
-      expect(grid.checkPlayerWinRightDiag("X", inLine)).toBe(expectedBool);
+      expect(grid.checkPlayerWinRightDiag(1)).toBe(expectedBool);
       expect(grid.winningCells).toEqual(expectedList);
-    }
-  );
-});
-
-describe(".scorePosition()", () => {
-  const grid = new Grid(8, 10);
-  const indices = [
-    [[4, 9], [4, 8], [3, 9], [5, 9], "X", 14],
-    [[0, 0], [3, 0], [2, 3], [5, 9], "O", 4],
-    [[2, 2], [3, 2], [3, 3], "X", 9],
-    [[2, 2], [3, 2], [3, 4], "X", 5],
-  ];
-
-  afterEach(() => {
-    return grid.reset();
-  });
-
-  it.each(indices)(
-    "evaluates the score for each player in the grid: " + "%j, %j, %j, %j",
-    (...pos) => {
-      const expected = pos.pop() as number;
-      const player = pos.pop() as string;
-      const current = pos as number[][];
-
-      for (const index of current) {
-        grid.setIndexXY(index[0], index[1], player);
-      }
-
-      expect(grid.scorePosition()[player]).toBe(expected);
     }
   );
 });
