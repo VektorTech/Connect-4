@@ -170,17 +170,18 @@ describe(".checkPlayerWinRightDiag()", () => {
     [[0, 3], [1, 2], [2, 1], [6, 3], 4, [], false],
     [[0, 3], [1, 2], [2, 1], [3, 0], 4, [21, 15, 9, 3], true],
     [[0, 4], [1, 3], [2, 2], [3, 1], 4, [28, 22, 16, 10], true],
+    [[2, 4], [3, 3], [4, 2], [5, 1], 4, [30, 24, 18, 12], true],
   ];
 
   it.each(indices)(
-    "checks whether player occupies n consecutive cells in right diagonal on a 7x5 grid: " +
+    "checks whether player occupies n consecutive cells in right diagonal on a 7x6 grid: " +
       "%j, %j, %j, %j",
     (...pos) => {
       const expectedBool = pos.pop() as boolean;
       const expectedList = pos.pop() as number[];
       const inLine = pos.pop() as number;
       const current = pos as number[][];
-      const grid = new Grid(7, 5, inLine);
+      const grid = new Grid(7, 6, inLine);
 
 
       for (const index of current) {
