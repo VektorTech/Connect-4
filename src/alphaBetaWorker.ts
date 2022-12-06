@@ -5,11 +5,12 @@ importScripts("grid.bundle.js");
 const grid = new self.Grid(7, 6, 4);
 
 addEventListener('message', e => {
-  for (let key in e.data) {
+  const [_grid, depth] = e.data;
+  for (let key in _grid) {
     // @ts-ignore
-    grid[key] = e.data[key];
+    grid[key] = _grid[key];
   }
-  const [bestMove] = alphaBetaAI(grid);
+  const [bestMove] = alphaBetaAI(grid, depth);
   postMessage(bestMove);
 });
 
@@ -29,7 +30,7 @@ function alphaBetaAI(
   let bestMove;
   let bestScore = isMaximizingPlayer ? -Infinity : Infinity;
 
-  if (depth == 0 || isWinner(grid, lastPlayer) || grid.isGridFilled()) {
+  if (depth == 0 || grid.checkWinner(lastPlayer) || grid.isGridFilled()) {
     const score = evaluatePosition(grid) * (depth + 1);
     return [undefined, score];
   }
@@ -65,19 +66,10 @@ function alphaBetaAI(
   return [bestMove, bestScore];
 }
 
-function isWinner(grid: Grid, player: number) {
-  return (
-    grid.checkPlayerWinHorizontal(player) ||
-    grid.checkPlayerWinVertical(player) ||
-    grid.checkPlayerWinLeftDiag(player) ||
-    grid.checkPlayerWinRightDiag(player)
-  );
-}
-
 function evaluatePosition(grid: Grid) {
   const score = grid.scorePosition;
-  const AIScore = score[AI] + Number(isWinner(grid, AI)) * 10000;
-  const HUMANScore = score[HUMAN] + Number(isWinner(grid, HUMAN)) * 10000;
+  const AIScore = score[AI] + Number(grid.checkWinner(AI)) * 10000;
+  const HUMANScore = score[HUMAN] + Number(grid.checkWinner(HUMAN)) * 10000;
 
   return AIScore - HUMANScore;
 }
