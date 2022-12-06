@@ -9,6 +9,11 @@ body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  font-family: sans-serif;
+}
+
+body {
+  background-color: #fdfdfd;
 }
 
 *,
@@ -19,23 +24,59 @@ body {
   box-sizing: border-box;
 }
 
+button {
+  cursor: pointer;
+}
+
 .wrapper {
   --width: clamp(280px, 50vw, 480px);
 
   width: var(--width);
   height: 100%;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin: auto;
+  gap: 10px;
+}
+
+.difficulty-label {
+  display: block;
+}
+
+.difficulty {
+  margin-top: 5px;
+  height: 25px;
+  width: 50%;
+}
+
+.btn {
+  padding: 7px 20px;
+  background-color: rgb(255, 85, 85);
+  color: #fff;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: rgb(236, 58, 58);
+}
+
+.btn-right {
+  float: right;
 }
 
 #game {
-  margin: auto;
   display: inline-block;
 }
 
 #message {
-  position: absolute;
-  top: 0;
+  height: 20px;
+  line-height: 20px;
+  white-space: nowrap;
+  text-transform: capitalize;
+  font-weight: bold;
+  text-align: center;
 }
 
 .grid {
@@ -60,7 +101,7 @@ body {
   border: 5px solid var(--primary-blue);
   box-shadow: inset 0px 0px 0px 3px hsl(210, 100%, 37%),
     inset 0px 0px 0px 5px var(--primary-blue);
-  background-color: #fff;
+  background-color: #fdfdfd;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -89,7 +130,6 @@ body {
   position: relative;
   top: 50%;
   text-align: center;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 4.5vw;
   transform: translateY(-50%);

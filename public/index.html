@@ -10,8 +10,24 @@
 
 <body>
 	<div class="wrapper">
-		<div id="message"></div>
+		<h2 class="heading">The Digital Game Of</h2>
+		<h1 class="main">Connect 4</h1>
 		<div id="game"></div>
+		<div id="message" class="message"></div>
+		<div class="controls">
+			<button class="btn btn btn-right" id="reset">Restart</button>
+
+			<label for="difficulty" class="difficulty-label">Select Difficulty:</label>
+			<select class="difficulty" name="difficulty" id="difficulty">
+				<option value="0">Random Moves</option>
+				<option value="1">Random With Some Forethought</option>
+				<option value="2">Easy &mdash; Depth 2</option>
+				<option value="3">Medium &mdash; Depth 3</option>
+				<option selected value="4">Hard &mdash; Depth 5</option>
+				<option value="5">Harder &mdash; Depth 6</option>
+				<option value="6">Impossible &mdash; Depth 8</option>
+			</select>
+		</div>
 	</div>
 	<script src="./script.bundle.js"></script>
 </body>
