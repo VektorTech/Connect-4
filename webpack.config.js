@@ -5,7 +5,7 @@ module.exports = {
   entry: {
     script: "./src/index.ts",
     grid: "./src/grid.ts",
-    alphaBetaWorker: "./src/alphaBetaWorker.ts",
+    alphaBetaWorker: "./src/ai/alphaBetaWorker.ts",
   },
   output: {
     path: path.resolve(__dirname, "public"),
