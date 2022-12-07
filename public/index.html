@@ -10,25 +10,66 @@
 
 <body>
 	<div class="wrapper">
-		<h2 class="heading">The Digital Game Of</h2>
-		<h1 class="main">Connect 4</h1>
+		<h2 class="h5">The Digital Game Of</h2>
+		<h1 class="h2">Connect 4</h1>
 		<div id="game"></div>
-		<div id="message" class="message"></div>
+		<div id="message" class="message alert alert-primary mt-4"></div>
 		<div class="controls">
-			<button class="btn btn btn-right" id="reset">Restart</button>
+			<div class="mb-3 mt-3 text-end">
+				<button class="btn btn-secondary rounded-0" id="main">&laquo; Go Back</button>
+				<button class="btn btn-danger rounded-0" id="reset">Restart</button>
+			</div>
 
-			<label for="difficulty" class="difficulty-label">Select Difficulty:</label>
-			<select class="difficulty" name="difficulty" id="difficulty">
-				<option value="0">Random Moves</option>
-				<option value="1">Random With Some Forethought</option>
-				<option value="2">Easy &mdash; Depth 2</option>
-				<option value="3">Medium &mdash; Depth 3</option>
-				<option selected value="4">Hard &mdash; Depth 5</option>
-				<option value="5">Harder &mdash; Depth 6</option>
-				<option value="6">Impossible &mdash; Depth 8</option>
-			</select>
+			<div class="">
+				<label for="difficulty" class="form-label">Select Difficulty:</label>
+				<select class="form-select rounded-0" name="difficulty" id="difficulty">
+					<option value="0">Random Moves</option>
+					<option value="1">Random With Some Forethought</option>
+					<option value="2">Easy &mdash; Depth 2</option>
+					<option value="3">Medium &mdash; Depth 3</option>
+					<option selected value="4">Hard &mdash; Depth 5</option>
+					<option value="5">Harder &mdash; Depth 6</option>
+					<option value="6">Impossible &mdash; Depth 8</option>
+				</select>
+			</div>
+		</div>
+		<div id="game-end" class="game-end"></div>
+	</div>
+
+	<template id="select-mode-template">
+		<div class="">
+			<h3 class="select-heading h1 text-center">Choose Mode</h3>
+			<div class="select-controls">
+				<div class="select-ai">
+					<button id="select-v-ai" class="btn btn-primary rounded-0">
+						HUMAN vs AI
+					</button>
+				</div>
+				<div class="select-human">
+					<button id="select-v-human" class="disabled btn btn-primary rounded-0">
+						HUMAN vs HUMAN
+					</button>
+				</div>
+			</div>
+			<div class="">
+				<input id="username" type="text" placeholder="Name" name="name" class="form-control rounded-0">
+				<input disabled id="find-player" class="btn btn-primary rounded-0" type="submit" value="Find Player">
+			</div>
+		</div>
+	</template>
+
+	<div class="modal fade" id="gameOverModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div id="modal-body" class="modal-body">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger rounded-0" data-bs-dismiss="modal">Restart</button>
+				</div>
+			</div>
 		</div>
 	</div>
+
 	<script src="./script.bundle.js"></script>
 </body>
 
