@@ -17,6 +17,7 @@ export default class Game {
   reset() {
     this.grid.reset();
     this.currentPlayer = 0;
+    this.players = [];
   }
 
   addPlayer(playerID: string) {
@@ -24,8 +25,9 @@ export default class Game {
   }
 
   getWinnerInfo() {
+    const lastPlayerIndex = (this.currentPlayer + 1) % this.players.length;
     return {
-      winner: this.players[this.currentPlayer],
+      winner: this.players[lastPlayerIndex],
       cells: this.grid.winningCells,
     };
   }
@@ -41,19 +43,8 @@ export default class Game {
   }
 
   checkForWin() {
-    const win =
-      this.grid.checkPlayerWinHorizontal(
-        this.players.length - this.currentPlayer
-      ) ||
-      this.grid.checkPlayerWinVertical(
-        this.players.length - this.currentPlayer
-      ) ||
-      this.grid.checkPlayerWinLeftDiag(
-        this.players.length - this.currentPlayer
-      ) ||
-      this.grid.checkPlayerWinRightDiag(
-        this.players.length - this.currentPlayer
-      );
+    const lastPlayer = this.players.length - this.currentPlayer;
+    const win = this.grid.checkWinner(lastPlayer);
 
     if (win) {
       const event = new CustomEvent("game/win", {
