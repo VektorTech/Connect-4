@@ -1,9 +1,10 @@
 export default class Grid {
-  private lastPlayer = 0;
   private columnCount: number;
   private rowCount: number;
   private NConsecutive: number;
   private cellCount: number;
+
+  private lastPlayer = 0;
   private state: number[];
   private racks: number[];
   private winnerCells: number[] = [];
@@ -39,6 +40,7 @@ export default class Grid {
     this.state = new Array(this.cellCount).fill(0);
     this.racks = new Array(this.columnCount).fill(this.rowCount);
     this.winnerCells = [];
+    this.lastPlayer = 0;
   }
 
   isGridFilled() {
