@@ -1,5 +1,7 @@
 # Connect 4
 
+![Connect 4](./docs/connect4-scrn.png)
+
 ## Tech
 
 - BootStrap
@@ -7,6 +9,6 @@
 - Webpack
 - Jest
 
-# Start
+## Start
 
 Dev `npm run serve`
