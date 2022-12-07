@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap');
+
+:root {
+  --primary-red: #e2380d;
+  --primary-gold: #ebd405;
+  --primary-blue: #0c4dc5;
+  --bg-color: #fdfdfd;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  overflow-y: scroll;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.wrapper {
+  --width: clamp(280px, 60vw, 560px);
+
+  width: var(--width);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+}
+
+#game {
+  display: inline-block;
+  position: relative;
+}
+
+#message::before {
+  content: "| ";
+}
+
+.grid {
+  --cell-width: calc(var(--width) / var(--col));
+
+  width: 100%;
+  height: calc(var(--width) - var(--cell-width));
+  position: relative;
+  display: grid;
+  grid-template: repeat(var(--row), var(--cell-width)) / repeat(
+      var(--col),
+      var(--cell-width)
+    );
+  box-shadow: 0px 9px 11px rgb(0 0 0 / 80%);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.grid-dec {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgb(0, 26, 75) 0%,
+    transparent 2%,
+    transparent 98%,
+    rgb(0, 26, 75)
+  );
+  z-index: 10;
+  pointer-events: none;
+}
+
+.grid::before {
+  left: -20px;
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: 0;
+  box-shadow: 0px 9px 11px rgb(0 0 0 / 80%);
+  display: block;
+  z-index: 2;
+  width: 20px;
+  background: #1458cc;
+}
+
+.grid::after {
+  right: -20px;
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: 0;
+  box-shadow: 0px 9px 11px rgb(0 0 0 / 80%);
+  display: block;
+  z-index: 2;
+  width: 20px;
+  background: #1458cc;
+}
+
+.grid-cell {
+  overflow: hidden;
+  z-index: 10;
+  display: flex;
+}
+
+.grid-cell-inner {
+  width: calc(100% - 9px);
+  height: calc(100% - 9px);
+  margin: auto;
+  box-shadow: inset 0px 0px 0px 3px hsl(210, 86%, 58%),
+    inset 0px 0px 0px 5px var(--primary-blue),
+    0px 0px 0px 25px var(--primary-blue);
+  border-radius: 50%;
+  display: flex;
+}
+
+.disc {
+  --disc-gap: 8px;
+
+  position: absolute;
+  width: calc(var(--cell-width) - var(--disc-gap) * 2);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: var(--primary-red);
+  left: calc(var(--disc-gap) + var(--colOffset) * var(--cell-width));
+  animation: drop 0.15s cubic-bezier(0.5, 0.15, 1, 0.45) forwards;
+  overflow: hidden;
+  box-shadow: inset 0px 0px 0px 4px hsl(0, 100%, 61%),
+    inset 2px 2px 2px 3px rgb(184, 34, 34);
+  z-index: 0;
+}
+
+.disc::before {
+  content: "4";
+  display: block;
+  color: hsl(0, 100%, 61%);
+  text-shadow: 1px 1px rgb(184, 34, 34);
+  position: relative;
+  top: 50%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 4.5vw;
+  transform: translateY(-50%);
+}
+
+.disc.gold {
+  box-shadow: inset 0px 0px 0px 4px hsl(60, 100%, 67%),
+    inset 2px 2px 2px 3px hsl(60, 99%, 35%);
+  background-color: var(--primary-gold);
+}
+
+.disc.gold::before {
+  color: hsl(60, 100%, 67%);
+  text-shadow: 1px 1px hsl(60, 99%, 35%);
+}
+
+.grid-cell .disc {
+  position: static;
+  margin: auto;
+  animation: none;
+}
+
+.grid-cell .disc-win {
+  animation: winners-bop 0.7s infinite ease-in-out;
+}
+
+@keyframes winners-bop {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.7);
+  }
+}
+
+@keyframes drop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(
+      calc(var(--cell-width) * var(--rowOffset) + var(--disc-gap))
+    );
+  }
+}
